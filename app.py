@@ -39,6 +39,10 @@ def books_input():
         return jsonify("Data Posted")
     return jsonify('Something went wrong')
 
+@app.route('/books', methods=['GET'])
+def return_books():
+    all_books = db.session.query(Books.title, Books.author).all()
+    return jsonify(all_books)
 
 if __name__ == '__main__':
     app.debug = True
