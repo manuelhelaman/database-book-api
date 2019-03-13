@@ -41,8 +41,35 @@ def books_input():
 
 @app.route('/books', methods=['GET'])
 def return_books():
-    all_books = db.session.query(Books.title, Books.author).all()
+    all_books = db.session.query(Books.id, Books.title, Books.author).all()
     return jsonify(all_books)
+
+@app.route('/update_book/<id>', methods=["PUT"])
+def book_update(id):
+    if request.content_type == 'application/json':
+        put_data = request.get_json()
+        title = put_data.get('title')
+        author = put_data.get('author')    
+        record = db.session.query(Books).get(id)
+        record.title = title
+        record.author = author
+        db.session.commit()
+        return jsonify("Completed Update")
+    return jsonify("Update Failed")    
+
+@app.route('/book/<id>', methods=["GET"])
+def return_single_book(id):
+    one_book = db.session.query(Books.id, Books.title, Books.author).filter(Books.id == id).first()
+    return jsonify(one_book)    
+
+@app.route('/delete/<id>', methods=["DELETE"])
+def book_delete(id):
+    if request.content_type == 'application/json':
+        record = db.session.query(Books).get(id)
+        db.session.delete(record)
+        db.session.commit()
+        return jsonify("Completed Delete action")
+    return jsonify("Delete Failed")    
 
 if __name__ == '__main__':
     app.debug = True
